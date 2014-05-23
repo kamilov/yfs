@@ -12,27 +12,60 @@ use yfs\Provider;
 
 class Ftp extends Provider
 {
+    /**
+     * хост ftp-сервера
+     * @var string
+     */
     public $host;
 
+    /**
+     * порт
+     * @var int
+     */
     public $port = 21;
 
+    /**
+     * таймаут
+     * @var int
+     */
     public $timeout = 90;
 
+    /**
+     * имя пользователя ftp-сервера
+     * @var string
+     */
     public $username;
 
+    /**
+     * пароль пользователя
+     * @var string
+     */
     public $password;
 
-    public $passive = false;
-
+    /**
+     * флаг определяющий использование ssl соединения вместо обычного
+     * @var bool
+     */
     public $ssl = false;
 
+    /**
+     * ссылка на соединение с ftp-сервером
+     * @var resource
+     */
     private $_stream;
 
+    /**
+     * после завершения работы - закрываем соединение с сервером
+     */
     public function __destruct()
     {
         ftp_close($this->_stream);
     }
 
+    /**
+     * соединение с сервером и авторизация
+     * @throws \CException
+     */
     public function init()
     {
         if(!extension_loaded('ftp')) {
@@ -57,6 +90,8 @@ class Ftp extends Provider
             ]));
         }
 
+        ftp_pasv($this->_stream, true);
+
         if(@ftp_chdir($this->_stream, $this->privatePath) === false) {
             throw new \CException(\Yii::t('yfs.category', 'Директория "{path}" не найдена на FTP-сервере {host}:{port}.', [
                 '{path}' => $this->privatePath,
@@ -64,11 +99,6 @@ class Ftp extends Provider
                 '{port}' => $this->port
             ]));
         }
-        else if(@ftp_nlist($this->_stream, $this->privatePath) === false) {
-            $this->passive = true;
-        }
-
-        ftp_pasv($this->_stream, $this->passive);
     }
 
     /**
@@ -143,6 +173,10 @@ class Ftp extends Provider
         }
     }
 
+    /**
+     * метод рекурсиного создания указанной директории
+     * @param string $path
+     */
     private function _createDirectory($path)
     {
         if(@ftp_chdir($this->_stream, $path) === false) {

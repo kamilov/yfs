@@ -23,6 +23,7 @@ namespace yfs;
  * @property string $createdAt
  * @property string $updatedAt
  * @property string $source
+ * @property string $link
  *
  * @property File $parent
  * @property File[] $child
@@ -283,6 +284,15 @@ class File extends \CActiveRecord implements iFile
         if($file->save()) {
             $this->addRelatedRecord('child', $file, $file->index);
         }
+    }
+
+    /**
+     * формирует и возвращает путь к файлу для клиентского доступа
+     * @return string
+     */
+    public function getLink()
+    {
+        return $this->getProvider()->publicPath . Provider::DIRECTORY_SEPARATOR . $this->path;
     }
 }
 
