@@ -20,8 +20,8 @@ class Migration extends \CDbMigration
         $this->createTable($this->getTableName(), [
             'id'         => 'INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT',
             'parentId'   => 'INT UNSIGNED NULL DEFAULT NULL',
-            'size'       => 'INT UNSIGNED NOT NULL',
-            'category'   => 'VARCHAR(75) NULL DEFAULT NULL',
+            'size'       => 'INT UNSIGNED NOT NULL DEFAULT 0',
+            'category'   => 'VARCHAR(75) NULL DEFAULT NULL DEFAULT \'' . File::DEFAULT_CATEGORY_NAME . '\'',
             'path'       => 'VARCHAR(75) NOT NULL',
             'mime'       => 'VARCHAR(75) NOT NULL',
             'index'      => 'VARCHAR(10) NULL DEFAULT NULL',

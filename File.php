@@ -46,6 +46,11 @@ class File extends \CActiveRecord implements iFile
     const DEFAULT_TABLE_NAME = '{{YiiFileStorage}}';
 
     /**
+     * имя категории по умолчанию
+     */
+    const DEFAULT_CATEGORY_NAME = 'Undefined';
+
+    /**
      * @var Provider
      */
     public static $provider;
@@ -55,6 +60,12 @@ class File extends \CActiveRecord implements iFile
      * @var string
      */
     private $_source;
+
+    /**
+     * список дочерних элементов по категориям
+     * @var \CMap[]
+     */
+    private $_childCategories;
 
     /**
      * @param string $className
@@ -284,6 +295,27 @@ class File extends \CActiveRecord implements iFile
         if($file->save()) {
             $this->addRelatedRecord('child', $file, $file->index);
         }
+    }
+
+    /**
+     * возвращает дочерние файлы сгруппированные по категориям
+     * @param string $name
+     * @param bool $refresh
+     * @return \CMap|null
+     */
+    public function childCategory($name, $refresh = false)
+    {
+        if($this->_childCategories === null or $refresh) {
+            $this->_childCategories = [];
+
+            foreach($this->child as $child) {
+                if(!isset($this->_childCategories[$child->category])) {
+                    $this->_childCategories[$child->category] = new \CMap();
+                }
+                $this->_childCategories[$child->category]->add($child->index, $child);
+            }
+        }
+        return isset($this->_childCategories[$name]) ? $this->_childCategories[$name] : null;
     }
 
     /**
